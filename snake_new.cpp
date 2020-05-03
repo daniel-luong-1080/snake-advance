@@ -17,13 +17,25 @@ direction dir;
 void clrscr() {
   COORD cursorPosition;	cursorPosition.X = 0;	cursorPosition.Y = 0;
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+}
+
+
+void showCursor(bool state) {
   HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 
   CONSOLE_CURSOR_INFO     cursorInfo;
-
   GetConsoleCursorInfo(out, &cursorInfo);
-  cursorInfo.bVisible = false; // set the cursor visibility
+  cursorInfo.bVisible = state; // set the cursor visibility
   SetConsoleCursorInfo(out, &cursorInfo);
+}
+
+
+void adjustWindow(int x, int y) {
+  HWND console = GetConsoleWindow();
+  RECT r;
+  GetWindowRect(console, &r); //stores the console's current dimensions
+
+  MoveWindow(console, r.left, r.top, x, y, TRUE);
 }
 
 
@@ -93,6 +105,8 @@ void logic()
     int prev2X, prev2Y;
     int prevX = tailX[0];
     int prevY = tailY[0];
+    tailX[0] = x;
+    tailY[0] = y;
     for (int i = 1; i < lenghtTail; i++)
     {
         prev2X = tailX[i];
@@ -101,8 +115,6 @@ void logic()
         tailY[i] = prevY;
         prevX = prev2X;
         prevY = prev2Y;
-        tailX[0] = x;
-        tailY[0] = y;
     }
 
     switch (dir)
@@ -131,6 +143,10 @@ void logic()
         y = height;
     if (y > height)
         y = 0;
+
+    for (int i = 0; i < lenghtTail; i++)
+      if (tailX[i] == x && tailY[i] == y)
+        gameOver = true;
 
     if (x == fruitX && y == fruitY)
     {
@@ -176,7 +192,7 @@ void gameplay() {
       render();
       logic();
       input();
-      Sleep(100);
+      Sleep(30);
   }
 }
 
@@ -185,6 +201,7 @@ void welcome() {
   bool welcomeLoop = true;
   while (welcomeLoop)
   {
+    system("cls");
     cout << "Welcome to Snake\n";
     cout << "Play\n";
     cout << "Quit\n";
@@ -199,10 +216,10 @@ void welcome() {
     }
     if (welcomeInput == "quit")
     {
-      clrscr();
+      system("cls");
       cout << "Exiting the game...";
       Sleep(1000);
-      clrscr();
+      system("cls");
       exit(0);
     }
     else
@@ -217,6 +234,8 @@ void welcome() {
 
 int main()
 {
+  adjustWindow(500,600);
+  showCursor(false);
     welcome();
     return 0;
 }
