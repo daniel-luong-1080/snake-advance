@@ -1,6 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <Windows.h>
+#include <ctime>
 using namespace std;
 
 
@@ -8,7 +9,7 @@ bool gameOver;
 const int width = 30;
 const int height = 30;
 int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100];
+int tailX[100], tailY[100], poisonX[100], poisonY[100];
 int lenghtTail;
 enum direction { STOP, UP, DOWN, LEFT, RIGHT };
 direction dir;
@@ -42,12 +43,17 @@ void adjustWindow(int x, int y) {
 void setup()
 {
     gameOver = false;
-    dir = STOP;
+    dir = RIGHT;
     x = width / 2;
     y = height / 2;
     fruitX = rand() % width;
     fruitY = rand() % height;
     score = 0;
+    lenghtTail = 0;
+    for (int i=0; i<100; i++) {
+      poisonX[i] = rand() % width;
+      poisonY[i] = rand() % height;
+    }
 }
 
 
@@ -76,27 +82,39 @@ void render()
                 cout << "\b";
                 cout << "f";
             }
-            else
-                for (int k = 0; k < lenghtTail; k++)
+            else {
+              for (int k = 0; k < lenghtTail; k++)
+              {
+                if (tailX[k] == j && tailY[k] == i)
                 {
-                    if (tailX[k] == j && tailY[k] == i)
-                    {
-                        cout << "\b";
-                        cout << "+";
-                    }
+                  cout << "\b";
+                  cout << "+";
                 }
-                cout << " ";
+              }
+            }
+            cout << " ";
             if (j == width - 1)
                 cout << "|";
+
+            if (score >= 50) {
+              for (int a=rand()%width; a<100; a++) {
+                if (poisonX[a] == j && poisonY[a] == i) {
+                  cout << "\b";
+                  cout << "x";
+                }
+              }
+            }
         }
         cout << endl;
     }
 
-    for (int i = 0; i < width+31; i++)
-        cout << "-";
-        cout << endl;
 
-        cout << "Score:" << score << endl;
+    for (int i = 0; i < width+31; i++)
+      cout << "-";
+
+    cout << endl;
+    cout << "Score:" << score << endl;
+    cout << "Hit 'q' while playing will exit the game";
 }
 
 
@@ -154,7 +172,6 @@ void logic()
         fruitX = rand() % width;
         fruitY = rand() % height;
         lenghtTail++;
-
     }
 }
 
@@ -192,15 +209,12 @@ void gameplay() {
       render();
       logic();
       input();
-      Sleep(30);
+      Sleep(0);
   }
 }
 
 
 void welcome() {
-  bool welcomeLoop = true;
-  while (welcomeLoop)
-  {
     system("cls");
     cout << "Welcome to Snake\n";
     cout << "Play\n";
@@ -227,13 +241,14 @@ void welcome() {
       cout << "Invalid input, please try again";
       Sleep(0);
       clrscr();
+      welcome();
     }
-  }
 }
 
 
 int main()
 {
+  srand(time(NULL));
   adjustWindow(500,600);
   showCursor(false);
     welcome();
