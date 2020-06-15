@@ -4,46 +4,49 @@
 #include <ctime>
 using namespace std;
 
+/*#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77*/
+
 
 bool gameOver;
 const int width = 30;
 const int height = 30;
 int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100], poisonX[10000], poisonY[10000];
+int tailX[100], tailY[100];
 int lenghtTail;
 enum direction { STOP, UP, DOWN, LEFT, RIGHT };
 direction dir;
 
-
+//-----------------------Clear screen func------------------------------------//
 void clrscr() {
   COORD cursorPosition;	cursorPosition.X = 0;	cursorPosition.Y = 0;
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
 
-
+//---------------------------Able/Disable cursor------------------------------//
 void showCursor(bool state) {
   HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
-
   CONSOLE_CURSOR_INFO     cursorInfo;
   GetConsoleCursorInfo(out, &cursorInfo);
   cursorInfo.bVisible = state; // set the cursor visibility
   SetConsoleCursorInfo(out, &cursorInfo);
 }
 
-
+//---------------------------Adjust window size-------------------------------//
 void adjustWindow(int x, int y) {
   HWND console = GetConsoleWindow();
   RECT r;
   GetWindowRect(console, &r); //stores the console's current dimensions
-
   MoveWindow(console, r.left, r.top, x, y, TRUE);
 }
 
-
+//-------------------------------Setup the stats------------------------------//
 void setup()
 {
     gameOver = false;
-    dir = RIGHT;
+    dir = STOP;
     x = width / 2;
     y = height / 2;
     fruitX = rand() % width;
@@ -52,7 +55,7 @@ void setup()
     lenghtTail = 0;
 }
 
-
+//----------------------------------Render map & snake------------------------//
 void render()
 {
     clrscr();
@@ -117,7 +120,7 @@ void render()
     cout << "Hit 'ESC' key to exit the game";
 }
 
-
+//--------------------------------Logic for the snake-------------------------//
 void logic()
 {
     int prev2X, prev2Y;
@@ -166,7 +169,7 @@ void logic()
       if (tailX[i] == x && tailY[i] == y) {
         gameOver = true;
         system("cls");
-        cout << "Game over! You lose!" << endl;
+        cout << "The snake bit itself. You lose!" << endl;
         cout << "Score: " << score;
         Sleep(3000);
       }
@@ -186,7 +189,7 @@ void logic()
     } */
 }
 
-
+//--------------------------------Scan the input------------------------------//
 void input()
 {
     if (_kbhit())
@@ -194,16 +197,23 @@ void input()
         switch (_getch())
         {
         case 'a':
+        case char(75):
             dir = LEFT;
             break;
         case 'd':
+        case char(77):
             dir = RIGHT;
             break;
         case 'w':
+        case char(72):
             dir = UP;
             break;
         case 's':
+        case char(80):
             dir = DOWN;
+            break;
+        case 'p':
+            dir = STOP;
             break;
         case char(27):
             gameOver = true;
@@ -215,7 +225,7 @@ void input()
     }
 }
 
-
+//----------------------------------Start the game----------------------------//
 void gameplay() {
   setup();
   while (!gameOver)
@@ -227,11 +237,12 @@ void gameplay() {
   }
 }
 
-
+//-------------------------------Print welcome screen-------------------------//
 void welcome() {
     system("cls");
     cout << "Welcome to Snake\n";
     cout << "Version: Alpha v0.0.1\n";
+    cout << "Use WASD to play the game" << endl;
     cout << "Play or Quit? ";
 
     string welcomeInput;
@@ -251,18 +262,18 @@ void welcome() {
     else
     {
       cout << "Invalid input, please try again";
-      Sleep(0);
+      Sleep(1000);
       clrscr();
       welcome();
     }
 }
 
-
+//--------------------------------------Run everything------------------------//
 int main()
 {
   srand(time(NULL));
   adjustWindow(500,600);
   showCursor(false);
-    welcome();
-    return 0;
+  welcome();
+  return 0;
 }
