@@ -9,7 +9,7 @@ bool gameOver;
 const int width = 30;
 const int height = 30;
 int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100], poisonX[100], poisonY[100];
+int tailX[100], tailY[100], poisonX[10000], poisonY[10000];
 int lenghtTail;
 enum direction { STOP, UP, DOWN, LEFT, RIGHT };
 direction dir;
@@ -50,10 +50,6 @@ void setup()
     fruitY = rand() % height;
     score = 0;
     lenghtTail = 0;
-    for (int i=0; i<100; i++) {
-      poisonX[i] = rand() % width;
-      poisonY[i] = rand() % height;
-    }
 }
 
 
@@ -80,7 +76,7 @@ void render()
             else if (i == fruitY && j == fruitX)
             {
                 cout << "\b";
-                cout << "f";
+                cout << "*";
             }
             else {
               for (int k = 0; k < lenghtTail; k++)
@@ -88,7 +84,7 @@ void render()
                 if (tailX[k] == j && tailY[k] == i)
                 {
                   cout << "\b";
-                  cout << "+";
+                  cout << "x";
                 }
               }
             }
@@ -96,14 +92,18 @@ void render()
             if (j == width - 1)
                 cout << "|";
 
-            if (score >= 50) {
-              for (int a=rand()%width; a<100; a++) {
+          /*  if (score >= 50) {
+              for (int i=0; i<10000; i++) {
+                poisonX[i] = rand() % width;
+                poisonY[i] = rand() % height;
+              }
+              for (int a=score; a<score+10; a++) {
                 if (poisonX[a] == j && poisonY[a] == i) {
                   cout << "\b";
                   cout << "x";
                 }
               }
-            }
+            } */
         }
         cout << endl;
     }
@@ -114,7 +114,7 @@ void render()
 
     cout << endl;
     cout << "Score:" << score << endl;
-    cout << "Hit 'q' while playing will exit the game";
+    cout << "Hit 'ESC' key to exit the game";
 }
 
 
@@ -163,8 +163,13 @@ void logic()
         y = 0;
 
     for (int i = 0; i < lenghtTail; i++)
-      if (tailX[i] == x && tailY[i] == y)
+      if (tailX[i] == x && tailY[i] == y) {
         gameOver = true;
+        system("cls");
+        cout << "Game over! You lose!" << endl;
+        cout << "Score: " << score;
+        Sleep(3000);
+      }
 
     if (x == fruitX && y == fruitY)
     {
@@ -173,6 +178,12 @@ void logic()
         fruitY = rand() % height;
         lenghtTail++;
     }
+
+    /*for (int a=score; a<score+10; a++) {
+      if (poisonX[a] == x && poisonY[a] == y) {
+        gameOver = true;
+      }
+    } */
 }
 
 
@@ -194,8 +205,11 @@ void input()
         case 's':
             dir = DOWN;
             break;
-        case 'q':
+        case char(27):
             gameOver = true;
+            system("cls");
+            cout << "Score: " << score;
+            Sleep(3000);
             break;
         }
     }
@@ -209,7 +223,7 @@ void gameplay() {
       render();
       logic();
       input();
-      Sleep(0);
+      Sleep(50);
   }
 }
 
@@ -217,18 +231,16 @@ void gameplay() {
 void welcome() {
     system("cls");
     cout << "Welcome to Snake\n";
-    cout << "Play\n";
-    cout << "Quit\n";
     cout << "Version: Alpha v0.0.1\n";
-    cout << "Input goes here: ";
+    cout << "Play or Quit? ";
 
     string welcomeInput;
     cin >> welcomeInput;
-    if (welcomeInput == "play")
+    if (welcomeInput == "play" || welcomeInput == "Play")
     {
       gameplay();
     }
-    if (welcomeInput == "quit")
+    if (welcomeInput == "quit" || welcomeInput == "Quit")
     {
       system("cls");
       cout << "Exiting the game...";
